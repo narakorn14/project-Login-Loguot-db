@@ -20,13 +20,10 @@
         <div class="collapse navbar-collapse" id="#navbarNav">
           <ul class="navbar-nav ms-auto">
             <li class="nav-item">
-              <a href="index.php" class="nav-link">Home</a>
+              <a href="index.php" class="nav-link">Welcome, </a>
             </li>
             <li class="nav-item">
-              <a href="login.html" class="nav-link">Sign In</a>
-            </li>
-            <li class="nav-item">
-              <a href="register.html" class="btn btn-primary" role="button">Sign Up</a>
+              <a class="btn btn-danger" id="logoutButton" >Logout</a>
             </li>
           </ul>
         </div>
@@ -34,25 +31,17 @@
     </nav>
 <!-- End Navbar -->
 <!-- Heros -->
-<div class="main-content">
-  <div class="container">
-    <div class="hero-section">
-      <h1>Welcome to our website</h1>
-      <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Magni labore quas eum excepturi necessitatibus cumque voluptas, debitis praesentium repudiandae maiores molestiae explicabo tempore similique architecto corrupti doloremque numquam eveniet enim delectus, dolor reiciendis provident dolorem. Reprehenderit tempore dicta, distinctio laborum sequi suscipit ut esse! Similique vero modi quae aperiam sapiente.</p>
-      <div>
-        <a href="login.html" class="btn btn-success btn-lg btn-custom">Sign In</a>
-        <a href="register.html" class="btn btn-info btn-lg btn-custom">Create an account</a>
-      </div>
+    <div class="container mt-5">
+        <div class="card bg-secondary-subtle" role="alert">
+            <div class="card-body">
+                <h4 class="alert-heading">Welcome, </h4>
+                <p>This is your dashboard</p>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
 <!-- End Heros -->
 <!-- Footer -->
-<footer class="footer mt-auto">
-  <div class="container">
-    <span>&copy; <?php echo date("Y"); ?> AuthSystem</span>
-  </div>
-</footer>
+
 <!-- End Footer -->
 
   <script src="assets/js/bootstrap.min.js"></script>
