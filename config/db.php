@@ -19,7 +19,7 @@ try {
 } catch(PDOException $e) {
     header('Content-Type: application/json');
     echo json_encode([
-        'stastus' => 'error',
+        'status' => 'error',
         'message' => 'Database connection failed: ' . $e->getMessage()
     ]);
     exit;

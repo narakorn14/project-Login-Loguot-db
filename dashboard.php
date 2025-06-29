@@ -1,3 +1,19 @@
+<?php
+// Start session to check login status
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Check if the user is logged in, if not then redirect to login page
+if (!isset($_SESSION["logged_in"]) || $_SESSION["logged_in"] !== true) {
+    header("location: login.html");
+    exit;
+}
+
+// User is logged in, welcome them
+$username = htmlspecialchars($_SESSION["username"]); // Sanitize output
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,7 +36,7 @@
         <div class="collapse navbar-collapse" id="#navbarNav">
           <ul class="navbar-nav ms-auto">
             <li class="nav-item">
-              <a href="index.php" class="nav-link">Welcome, </a>
+              <a href="index.php" class="nav-link">Welcome, <?php echo $username; ?>!</a>
             </li>
             <li class="nav-item">
               <a class="btn btn-danger" id="logoutButton" >Logout</a>
@@ -34,7 +50,7 @@
     <div class="container mt-5">
         <div class="card bg-secondary-subtle" role="alert">
             <div class="card-body">
-                <h4 class="alert-heading">Welcome, </h4>
+                <h4 class="alert-heading">Welcome, <?php echo $username; ?>!</h4>
                 <p>This is your dashboard</p>
             </div>
         </div>
@@ -45,5 +61,7 @@
 <!-- End Footer -->
 
   <script src="assets/js/bootstrap.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+  <script src="assets/js/script.js"></script>
 </body>
 </html>

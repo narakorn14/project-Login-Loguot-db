@@ -1,117 +1,155 @@
 $(document).ready(function() {
     // --- Registration Handler ---
-    $('#registerForm').on('submit', function(e) {
-        e.preventDefault();
+    $('#registerForm').on('submit', function(event) {
+        event.preventDefault(); // ป้องกันการ refresh หน้าเว็บเมื่อ submit ฟอร์ม
 
+        // Clear previous messages
         $('#message-area').html('');
 
+        // Basic client-side validation (optional, server-side is crucial)
         let username = $('#username').val().trim();
         let email = $('#email').val().trim();
         let password = $('#password').val();
         let confirm_password = $('#confirm_password').val();
 
         if (!username || !email || !password || !confirm_password) {
-            displayMessage('Please enter all the input fields!!', 'danger');
+            displayMessage('กรุณากรอกข้อมูลให้ครบทุกช่อง', 'danger');
             return;
         }
 
         if (password !== confirm_password) {
-            displayMessage('Password and confirm password do not match!!', 'danger');
+            displayMessage('รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน', 'danger');
             return;
         }
 
+        // Password strength (basic example, can be more complex)
         if (password.length < 8) {
-            displayMessage('Password must be at least 8 characters long!!', 'danger');
+            displayMessage('รหัสผ่านต้องมีความยาวอย่างน้อย 8 ตัวอักษร', 'danger');
             return;
         }
 
+        // เตรียมข้อมูลที่จะส่ง
         let formData = {
-            username,
-            email,
-            password,
-            confirm_password
-        }
+            username: username,
+            email: email,
+            password: password,
+            confirm_password: confirm_password // ส่ง confirm_password ไปให้ server ตรวจสอบอีกครั้งก็ได้
+        };
 
-        // console.log(formData);
 
         $.ajax({
             type: 'POST',
-            url: 'api/register.php',
+            url: `api/register.php`, // Endpoint ของ PHP script
             data: formData,
-            datatype: 'json',
-            success(response){
+            dataType: 'json', // คาดหวังข้อมูลตอบกลับเป็น JSON
+            success: function(response) {
                 if (response.status === 'success') {
                     displayMessage(response.message, 'success');
-                    $('#registerForm')[0].reset();
+                    $('#registerForm')[0].reset(); // ล้างข้อมูลในฟอร์ม
+                    // อาจจะ redirect ไปหน้า login หลังจากลงทะเบียนสำเร็จ
+                    // setTimeout(function() {
+                    //    window.location.href = 'login.html';
+                    // }, 2000); // Redirect after 2 seconds
                 } else {
                     displayMessage(response.message, 'danger');
                 }
             },
-            error(xhr, status, error) {
-                console.error('AJAX Error:', status, error, xhr.responseText);
-                displayMessage('An error occured while sending data: ' + error + 'please check your console', 'danger');                
+            error: function(xhr, status, error) {
+                // Handle AJAX errors (e.g., server not reachable, 500 error)
+                console.error("AJAX Error:", status, error, xhr.responseText);
+                displayMessage('เกิดข้อผิดพลาดในการส่งข้อมูล: ' + error + '. โปรดตรวจสอบ Console.', 'danger');
             }
-        })
-    })
-    // --- Login Handler ---
-    $('#loginForm').on('submit', function(e) {
-        e.preventDefault();
+        });
+    });
 
-        $('#login-message-area').html('');
+    // --- Login Handler ---
+    $('#loginForm').on('submit', function(event) {
+        event.preventDefault(); // ป้องกันการ submit ฟอร์มแบบปกติ
+
+        $('#login-message-area').html(''); // Clear previous messages
 
         let username = $('#username').val().trim();
         let password = $('#password').val();
 
         if (!username || !password) {
-            displayLoginMessage('Please enter your username and password', 'danger');
+            displayLoginMessage('กรุณากรอกชื่อผู้ใช้ และรหัสผ่าน', 'danger');
             return;
         }
 
         let formData = {
-            tpye: 'POST',
+            username: username,
+            password: password
+        };
+
+        console.log(formData)
+
+        $.ajax({
+            type: 'POST',
             url: 'api/login.php',
             data: formData,
             dataType: 'json',
-            success(response) {
-                if (Response.status === 'success') {
+            success: function(response) {
+                if (response.status === 'success') {
                     displayLoginMessage(response.message, 'success');
+                    // Redirect to dashboard or another page
                     if (response.redirect_url) {
                         setTimeout(function() {
-                            window.location.href = response.redirect_url;    
-                        }, 1500);
+                            window.location.href = response.redirect_url;
+                        }, 1500); // Redirect after 1.5 seconds
                     }
                 } else {
                     displayLoginMessage(response.message, 'danger');
                 }
             },
-            error(xhr, status, success) {
-                console.error('AJAX error ', status, error. xhr.responseText);
-                displayLoginMessage('An error occurred white sending data', error, 'danger');
+            error: function(xhr, status, error) {
+                console.error("AJAX Error:", status, error, xhr.responseText);
+                displayLoginMessage('เกิดข้อผิดพลาดในการส่งข้อมูล: ' + error + '. โปรดตรวจสอบ Console.', 'danger');
             }
-        }
+        });
+    });
 
-    })
+    // --- Logout Handler (เพิ่มใหม่) ---
+    $('#logoutButton').on('click', function(event) {
+        event.preventDefault(); // ป้องกัน behavior ปกติของปุ่ม (ถ้ามี)
 
-    // Function to display message in the message-area
+        // อาจจะแสดง loading spinner ตรงนี้
+
+        $.ajax({
+            type: 'POST', // หรือ 'GET' ก็ได้สำหรับ logout ถ้าไม่มีการส่งข้อมูลที่ sensitive
+            url: 'api/logout.php',
+            dataType: 'json',
+            success: function(response) {
+                if (response.status === 'success') {
+                    // แสดงข้อความสั้นๆ ก่อน redirect (optional)
+                    // displayDashboardMessage('กำลังออกจากระบบ...', 'info');
+                    // Redirect to login page
+                    window.location.href = 'login.html';
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX Logout Error:", status, error, xhr.responseText);
+                displayDashboardMessage('เกิดข้อผิดพลาดในการเชื่อมต่อเพื่อออกจากระบบ: ' + error, 'danger');
+            }
+        });
+    });
+
+    // Function to display messages in the message-area
     function displayMessage(message, type) {
         $('#message-area').html(
-            // alt * 96
-            `<div class='alert alert-${type} alert-dismissible fade show' role='alert'>
-            ${message}
-            <button tpye='button' class='btn-close' data-bs-dismiss='alert' aria-lable='Close'></button>
+            `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>`
-        )
+        );
     }
 
-    // Function to display message in the login message-area
+    // Function to display messages in the login message-area
     function displayLoginMessage(message, type) {
-        $('#login-message-area').html(
-            // alt * 96
-            `<div class='alert alert-${type} alert-dismissible fade show' role='alert'>
-            ${message}
-            <button tpye='button' class='btn-close' data-bs-dismiss='alert' aria-lable='Close'></button>
+        $('#login-message-area').html( // ของ login
+            `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>`
-        )
+        );
     }
-
-})
+});
